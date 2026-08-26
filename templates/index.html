@@ -1,39 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge | Interactive Digital Rights Helpline</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <title>Bridge | Interactive Legal & Digital Safety Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body { font-family: sans-serif; background: #f4f6f9; display: flex; justify-content: center; padding: 40px; }
+    .card { background: white; border-radius: 12px; padding: 32px; max-width: 550px; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .subtitle { color: #555; margin-bottom: 20px; }
+    .ussd-banner { background: #eef4ff; border: 1px solid #d0e1fd; padding: 12px; border-radius: 8px; color: #1e40af; font-size: 14px; margin-bottom: 24px; }
+    .field { margin-bottom: 16px; }
+    label { font-weight: bold; display: inline-block; margin-bottom: 6px; }
+    select, textarea, button { width: 100%; font-size: 15px; border-radius: 6px; box-sizing: border-box; }
+    select { padding: 8px; width: auto; }
+    textarea { padding: 12px; border: 1px solid #ccc; min-height: 100px; font-family: inherit; }
+    button { background: #2563eb; color: white; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 12px; }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #93c5fd; cursor: not-allowed; }
+    .response-box { margin-top: 24px; padding: 16px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: none; line-height: 1.5; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Bridge 🌉</h1>
-            <p>Interactive Legal & Digital Safety Assistant</p>
-        </header>
 
-        <div class="ussd-banner">
-            📱 No Internet? Dial <strong>*384*123#</strong> on any phone to access this helpline via USSD!
-        </div>
+<div class="card">
+  <h2>Bridge 🌉</h2>
+  <p class="subtitle" id="subtitle">Interactive Legal & Digital Safety Assistant</p>
 
-        <!-- Interactive Question Box -->
-        <main>
-            <div class="chat-card">
-                <h2>Ask for Help</h2>
-                <p>Describe your issue (e.g., mobile money scam, online threats, privacy violation):</p>
-                
-                <textarea id="user-input" placeholder="e.g., Someone is threatening to share my private messages online. What legal steps should I take?"></textarea>
-                <button id="send-btn">Get Legal Assistance</button>
-            </div>
+  <div class="ussd-banner">
+    📱 <span id="ussd-text">No Internet? Dial <strong>*384*123#</strong> on any phone to access this helpline via USSD!</span>
+  </div>
 
-            <div id="response-box" class="response-card hidden">
-                <h3>Recommended Action Steps</h3>
-                <div id="ai-reply"></div>
-            </div>
-        </main>
+  <h3 id="form-heading">Ask for Help</h3>
+  <p id="form-desc" style="color: #666; font-size: 14px;">Describe your issue (e.g., mobile money scam, online threats, privacy violation):</p>
+
+  <form id="helpForm" onsubmit="submitQuery(event)">
+    <div class="field">
+      <label id="lang-label">Preferred Language:</label>
+      <select id="languageSelect" onchange="updateLanguage()">
+        <option value="en">English</option>
+        <option value="lg">Luganda</option>
+        <option value="sw">Swahili</option>
+        <option value="nyn">Runyankole / Rukiga</option>
+        <option value="lgg">Lugbara</option>
+        <option value="ach">Acholi (Luo)</option>
+      </select>
     </div>
 
-    <script src="/static/app.js"></script>
+    <div class="field">
+      <textarea id="queryInput" placeholder="Type your issue here..." required></textarea>
+    </div>
+
+    <button type="submit" id="submitBtn">Get Legal Assistance</button>
+  </form>
+
+  <div id="responseBox" class="response-box"></div>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

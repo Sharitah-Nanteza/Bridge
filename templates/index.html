@@ -1,61 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Bridge | Interactive Legal & Digital Safety Assistant</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <style>
-    body { font-family: sans-serif; background: #f4f6f9; display: flex; justify-content: center; padding: 40px; }
-    .card { background: white; border-radius: 12px; padding: 32px; max-width: 550px; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .subtitle { color: #555; margin-bottom: 20px; }
-    .ussd-banner { background: #eef4ff; border: 1px solid #d0e1fd; padding: 12px; border-radius: 8px; color: #1e40af; font-size: 14px; margin-bottom: 24px; }
-    .field { margin-bottom: 16px; }
-    label { font-weight: bold; display: inline-block; margin-bottom: 6px; }
-    select, textarea, button { width: 100%; font-size: 15px; border-radius: 6px; box-sizing: border-box; }
-    select { padding: 8px; width: auto; }
-    textarea { padding: 12px; border: 1px solid #ccc; min-height: 100px; font-family: inherit; }
-    button { background: #2563eb; color: white; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 12px; }
-    button:hover { background: #1d4ed8; }
-    button:disabled { background: #93c5fd; cursor: not-allowed; }
-    .response-box { margin-top: 24px; padding: 16px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: none; line-height: 1.5; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge | Digital Safety Assistant</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: #f4f6f8; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: #ffffff; max-width: 600px; width: 100%; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 30px; }
+        .header h1 { font-size: 1.8rem; color: #1a1a1a; margin-bottom: 4px; }
+        .header p { color: #666; font-size: 1rem; }
+        .banner { background-color: #eef4ff; border: 1px solid #d0e1fd; color: #1e40af; padding: 12px 16px; border-radius: 8px; margin-top: 16px; font-size: 0.95rem; line-height: 1.4; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 16px; }
+        .form-group label { font-size: 0.95rem; margin-bottom: 6px; color: #222; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; outline: none; }
+        .form-control:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+        .btn-primary { width: 100%; padding: 14px; background-color: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+        .btn-primary:disabled { background-color: #93c5fd; cursor: not-allowed; }
+        .response-card { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; font-size: 0.98rem; line-height: 1.6; color: #1f2937; }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Bridge 🌉</h1>
+            <p id="tagline">Interactive Legal & Digital Safety Assistant</p>
+        </div>
 
-<div class="card">
-  <h2>Bridge 🌉</h2>
-  <p class="subtitle" id="subtitle">Interactive Legal & Digital Safety Assistant</p>
+        <!-- USSD Banner -->
+        <div class="banner">
+            📱 <span id="ussdText">No Internet? Dial <strong>*384*123#</strong> on any phone to access this helpline via USSD!</span>
+        </div>
 
-  <div class="ussd-banner">
-    📱 <span id="ussd-text">No Internet? Dial <strong>*384*123#</strong> on any phone to access this helpline via USSD!</span>
-  </div>
+        <form id="queryForm" style="margin-top: 20px;">
+            <!-- Language Dropdown -->
+            <div class="form-group">
+                <label for="languageSelect" id="langLabel" style="font-weight: bold;">Preferred Language:</label>
+                <select id="languageSelect" class="form-control" style="margin-top: 6px;" onchange="updateLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="lg">Luganda</option>
+                    <option value="sw">Kiswahili</option>
+                    <option value="nyn">Runyankole / Rukiga</option>
+                    <option value="lgg">Lugbara</option>
+                    <option value="ach">Acholi (Luo)</option>
+                </select>
+            </div>
 
-  <h3 id="form-heading">Ask for Help</h3>
-  <p id="form-desc" style="color: #666; font-size: 14px;">Describe your issue (e.g., mobile money scam, online threats, privacy violation):</p>
+            <!-- Query Section -->
+            <h3 id="sectionHeading" style="margin-top: 16px;">Ask for Help</h3>
+            <p id="sectionSubheading" style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">Describe your issue (e.g., mobile money scam, online threats, privacy violation):</p>
+            
+            <div class="form-group">
+                <textarea id="queryInput" class="form-control" rows="4" placeholder="Describe your issue here..."></textarea>
+            </div>
 
-  <form id="helpForm" onsubmit="submitQuery(event)">
-    <div class="field">
-      <label id="lang-label">Preferred Language:</label>
-      <select id="languageSelect" onchange="updateLanguage()">
-        <option value="en">English</option>
-        <option value="lg">Luganda</option>
-        <option value="sw">Swahili</option>
-        <option value="nyn">Runyankole / Rukiga</option>
-        <option value="lgg">Lugbara</option>
-        <option value="ach">Acholi (Luo)</option>
-      </select>
+            <button type="submit" id="submitBtn" class="btn-primary">Get Legal Assistance</button>
+        </form>
+
+        <!-- Dynamic Output Box -->
+        <div id="responseBox" class="response-card" style="display: none; margin-top: 20px;"></div>
     </div>
 
-    <div class="field">
-      <textarea id="queryInput" placeholder="Type your issue here..." required></textarea>
-    </div>
+    <script>
+        const uiTranslations = {
+            en: {
+                tagline: "Interactive Legal & Digital Safety Assistant",
+                ussdText: "No Internet? Dial <strong>*384*123#</strong> on any phone to access this helpline via USSD!",
+                langLabel: "Preferred Language:",
+                sectionHeading: "Ask for Help",
+                sectionSubheading: "Describe your issue (e.g., mobile money scam, online threats, privacy violation):",
+                placeholder: "Describe your issue here...",
+                submitBtn: "Get Legal Assistance",
+                loadingText: "Analyzing legal and digital safety options...",
+                playVoice: "🔊 Play Voice"
+            },
+            lg: {
+                tagline: "Omuyambi Wo Ku By'amateeka n'Obukuumi Ku Mutimbagano",
+                ussdText: "Tolina yintaneeti? Kubeera <strong>*384*123#</strong> ku ssimu yonna okufuna obuyambi obwa USSD!",
+                langLabel: "Londa Olulimi:",
+                sectionHeading: "Saba Obuyambi",
+                sectionSubheading: "Nnyonnyola ekizibu kyo (e.g., obufere bw'esimu, okutiisibwatiisibwa, okutyoboola ebyama):",
+                placeholder: "Wandika ekizibu kyo wano...",
+                submitBtn: "Funa Obuyambi Bw'Amateeka",
+                loadingText: "Okukunganya amagezi ku by'amateeka...",
+                playVoice: "🔊 Wuliriza Eddoboozi"
+            },
+            sw: {
+                tagline: "Msaidizi Wako wa Sheria na Usalama wa Mtandao",
+                ussdText: "Huna intaneti? Piga <strong>*384*123#</strong> kwa simu yoyote kupata huduma hii kupitia USSD!",
+                langLabel: "Chagua Lugha:",
+                sectionHeading: "Omba Msaada",
+                sectionSubheading: "Eleza tatizo lako (mf. utapeli wa pesa kwa simu, vitisho mtandaoni, ukiukaji wa faragha):",
+                placeholder: "Andika tatizo lako hapa...",
+                submitBtn: "Pata Msaada wa Kisheria",
+                loadingText: "Kuangalia hatua za kisheria na usalama...",
+                playVoice: "🔊 Sikiliza Sauti"
+            },
+            nyn: {
+                tagline: "Omuhabuzi W'amateeka n'Eby'okwerinda aha Mutimbagano",
+                ussdText: "Oteine intaneeti? Teera <strong>*384*123#</strong> aha simu yoona kutunga obuhabuzi via USSD!",
+                langLabel: "Toorana Oruhanga:",
+                sectionHeading: "Shaba Obuhabuzi",
+                sectionSubheading: "Shoboorora oburemeezi bwawe (mf. obufuru bwa marwa, okutinisibwa, okusisa ebyama):",
+                placeholder: "Handika oburemeezi bwawe aha...",
+                submitBtn: "Tunga Obuhabuzi Bw'Amateeka",
+                loadingText: "Orikusherura obuhabuzi bw'amateeka...",
+                playVoice: "🔊 Hurira Edjoboozi"
+            },
+            lgg: {
+                tagline: "A'di 'Ba E'yo Amani 'Diyi 'Ba Matu Niyia",
+                ussdText: "Intaneeti yo? Piga <strong>*384*123#</strong> simu azi 'dii dri a'di ussd ki!",
+                langLabel: "Sobiri Ti:",
+                sectionHeading: "Zi Konyi",
+                sectionSubheading: "O'du e'yo mi 'dii (e.g., mobile money scam, okpo enikani):",
+                placeholder: "O'du e'yo mi 'dii 'fani...",
+                submitBtn: "E'do Konyi Matu Niyia",
+                langLabel: "Sobiri Ti:",
+                playVoice: "🔊 Ongo Wula"
+            },
+            ach: {
+                tagline: "Lakonii me Chik dok Yub me Bedo maber I Internet",
+                ussdText: "Pe tye ki intaneeti? Go <strong>*384*123#</strong> i cimu mo keken me nongo kony pa USSD!",
+                langLabel: "Yer Leb:",
+                sectionHeading: "Kway Kony",
+                sectionSubheading: "Tit peko ni (e.g., goba me lim i cimu, bwola i internet):",
+                placeholder: "Coya peko ni kany...",
+                submitBtn: "Nong Kony me Chik",
+                loadingText: "Nyenyo tic me chik...",
+                playVoice: "🔊 Winj Dwono"
+            }
+        };
 
-    <button type="submit" id="submitBtn">Get Legal Assistance</button>
-  </form>
+        function updateLanguage(langCode) {
+            const t = uiTranslations[langCode] || uiTranslations.en;
 
-  <div id="responseBox" class="response-box"></div>
-</div>
+            document.getElementById("tagline").innerText = t.tagline;
+            document.getElementById("ussdText").innerHTML = t.ussdText;
+            document.getElementById("langLabel").innerText = t.langLabel;
+            document.getElementById("sectionHeading").innerText = t.sectionHeading;
+            document.getElementById("sectionSubheading").innerText = t.sectionSubheading;
+            document.getElementById("queryInput").placeholder = t.placeholder;
+            document.getElementById("submitBtn").innerText = t.submitBtn;
 
-<script src="{{ url_for('static', filename='app.js') }}"></script>
+            const speakBtn = document.getElementById("speakBtn");
+            if (speakBtn) {
+                speakBtn.innerHTML = t.playVoice;
+            }
+        }
+
+        document.getElementById("queryForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const queryInput = document.getElementById("queryInput");
+            const submitBtn = document.getElementById("submitBtn");
+            const responseBox = document.getElementById("responseBox");
+            const langCode = document.getElementById("languageSelect").value;
+
+            const query = queryInput.value.trim();
+            const t = uiTranslations[langCode] || uiTranslations.en;
+
+            if (!query) return;
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = t.loadingText;
+            responseBox.style.display = "block";
+            responseBox.innerHTML = `⏳ ${t.loadingText}`;
+
+            try {
+                const res = await fetch("/api/query", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: query, language: langCode })
+                });
+
+                const data = await res.json();
+
+                if (data.answer) {
+                    responseBox.innerHTML = `
+                        <div style="margin-bottom: 12px;">
+                            <button id="speakBtn" type="button" style="padding: 10px 18px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 6px;">
+                                ${t.playVoice}
+                            </button>
+                        </div>
+                        <div id="answerText">${data.answer.replace(/\n/g, '<br>')}</div>
+                    `;
+
+                    document.getElementById("speakBtn").onclick = () => playVoice(data.answer, langCode);
+                } else {
+                    responseBox.innerText = data.error || "An error occurred while fetching advice.";
+                }
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                responseBox.innerText = "Failed to fetch response. Please check your backend service.";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = t.submitBtn;
+            }
+        });
+
+        function playVoice(text, langCode) {
+            if (!("speechSynthesis" in window)) {
+                alert("Text-to-speech is not supported in this browser.");
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+
+            const voiceLocales = {
+                en: "en-US",
+                sw: "sw-KE",
+                lg: "en-UG",
+                nyn: "en-UG",
+                lgg: "en-UG",
+                ach: "en-UG"
+            };
+
+            utterance.lang = voiceLocales[langCode] || "en-US";
+            utterance.rate = 0.95;
+            window.speechSynthesis.speak(utterance);
+        }
+    </script>
 </body>
 </html>

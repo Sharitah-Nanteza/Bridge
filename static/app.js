@@ -1,9 +1,8 @@
-// Localized UI Strings Dictionary
 const uiTranslations = {
     en: {
         tagline: "Interactive Legal & Digital Safety Assistant",
         ussdText: "No Internet? Dial <strong>*384*123#</strong> on any phone to access this helpline via USSD!",
-        langLabel: "Preferred Language / Londa Olulimi:",
+        langLabel: "Preferred Language:",
         sectionHeading: "Ask for Help",
         sectionSubheading: "Describe your issue (e.g., mobile money scam, online threats, privacy violation):",
         placeholder: "Describe your issue here...",
@@ -36,7 +35,7 @@ const uiTranslations = {
     nyn: {
         tagline: "Omuhabuzi W'amateeka n'Eby'okwerinda aha Mutimbagano",
         ussdText: "Oteine intaneeti? Teera <strong>*384*123#</strong> aha simu yoona kutunga obuhabuzi via USSD!",
-        langLabel: "Toora Oruhanga:",
+        langLabel: "Toorana Oruhanga:",
         sectionHeading: "Shaba Obuhabuzi",
         sectionSubheading: "Shoboorora oburemeezi bwawe (mf. obufuru bwa marwa, okutinisibwa, okusisa ebyama):",
         placeholder: "Handika oburemeezi bwawe aha...",
@@ -47,7 +46,7 @@ const uiTranslations = {
     lgg: {
         tagline: "A'di 'Ba E'yo Amani 'Diyi 'Ba Matu Niyia",
         ussdText: "Intaneeti yo? Piga <strong>*384*123#</strong> simu azi 'dii dri a'di ussd ki!",
-        langLabel: "A'di Ti 'Diyi:",
+        langLabel: "Sobiri Ti:",
         sectionHeading: "Zi Konyi",
         sectionSubheading: "O'du e'yo mi 'dii (e.g., mobile money scam, okpo enikani):",
         placeholder: "O'du e'yo mi 'dii 'fani...",
@@ -69,15 +68,12 @@ const uiTranslations = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    const languageSelect = document.getElementById("languageSelect");
+    const langSelect = document.getElementById("languageSelect");
     const queryForm = document.getElementById("queryForm");
 
-    // Initialize UI language on boot
-    updateUILanguage(languageSelect.value);
-
-    // Update UI language whenever user changes the dropdown selection
-    languageSelect.addEventListener("change", (e) => {
-        updateUILanguage(e.target.value);
+    // Instantly update page content when dropdown value changes
+    langSelect.addEventListener("change", (e) => {
+        renderLocalizedUI(e.target.value);
     });
 
     if (queryForm) {
@@ -85,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-function updateUILanguage(langCode) {
+function renderLocalizedUI(langCode) {
     const t = uiTranslations[langCode] || uiTranslations.en;
 
     document.getElementById("tagline").innerText = t.tagline;
@@ -95,19 +91,24 @@ function updateUILanguage(langCode) {
     document.getElementById("sectionSubheading").innerText = t.sectionSubheading;
     document.getElementById("queryInput").placeholder = t.placeholder;
     document.getElementById("submitBtn").innerText = t.submitBtn;
+
+    // Update voice button if output already exists
+    const speakBtn = document.getElementById("speakBtn");
+    if (speakBtn) {
+        speakBtn.innerHTML = t.playVoice;
+    }
 }
 
 async function submitQuery(e) {
     e.preventDefault();
 
     const queryInput = document.getElementById("queryInput");
-    const languageSelect = document.getElementById("languageSelect");
     const submitBtn = document.getElementById("submitBtn");
     const responseBox = document.getElementById("responseBox");
+    const langCode = document.getElementById("languageSelect").value;
 
     const query = queryInput.value.trim();
-    const language = languageSelect.value;
-    const t = uiTranslations[language] || uiTranslations.en;
+    const t = uiTranslations[langCode] || uiTranslations.en;
 
     if (!query) return;
 
@@ -120,7 +121,7 @@ async function submitQuery(e) {
         const res = await fetch("/api/query", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query, language })
+            body: JSON.stringify({ query: query, language: langCode })
         });
 
         const data = await res.json();
@@ -128,14 +129,14 @@ async function submitQuery(e) {
         if (data.answer) {
             responseBox.innerHTML = `
                 <div style="margin-bottom: 12px;">
-                    <button id="speakBtn" type="button" style="padding: 8px 16px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 6px;">
+                    <button id="speakBtn" type="button" style="padding: 10px 18px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 6px;">
                         ${t.playVoice}
                     </button>
                 </div>
                 <div id="answerText">${data.answer.replace(/\n/g, '<br>')}</div>
             `;
 
-            document.getElementById("speakBtn").onclick = () => playVoice(data.answer, language);
+            document.getElementById("speakBtn").onclick = () => playVoice(data.answer, langCode);
         } else {
             responseBox.innerText = data.error || "An error occurred while fetching advice.";
         }
@@ -155,7 +156,6 @@ function playVoice(text, langCode) {
     }
 
     window.speechSynthesis.cancel();
-
     const utterance = new SpeechSynthesisUtterance(text);
 
     const voiceLocales = {
@@ -169,6 +169,5 @@ function playVoice(text, langCode) {
 
     utterance.lang = voiceLocales[langCode] || "en-US";
     utterance.rate = 0.95;
-
     window.speechSynthesis.speak(utterance);
 }

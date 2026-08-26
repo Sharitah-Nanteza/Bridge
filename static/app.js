@@ -1,38 +1,36 @@
 document.addEventListener("DOMContentLoaded", () => {
-    fetchLegalGuides();
-});
+    const sendBtn = document.getElementById("send-btn");
+    const userInput = document.getElementById("user-input");
+    const responseBox = document.getElementById("response-box");
+    const aiReply = document.getElementById("ai-reply");
 
-async function fetchLegalGuides() {
-    const container = document.getElementById("guides-container");
+    sendBtn.addEventListener("click", async () => {
+        const question = userInput.value.trim();
+        if (!question) return;
 
-    try {
-        const response = await fetch('/api/guides');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        sendBtn.disabled = true;
+        sendBtn.innerText = "Analyzing your issue...";
+        responseBox.classList.remove("hidden");
+        aiReply.innerHTML = "<p>Retrieving legal guidance...</p>";
+
+        try {
+            const res = await fetch("/api/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question })
+            });
+
+            const data = await res.json();
+            if (data.reply) {
+                aiReply.innerHTML = data.reply.replace(/\n/g, "<br>");
+            } else {
+                aiReply.innerText = data.error || "An error occurred. Please try again.";
+            }
+        } catch (err) {
+            aiReply.innerText = "Connection failed. Please check your backend server.";
+        } finally {
+            sendBtn.disabled = false;
+            sendBtn.innerText = "Get Legal Assistance";
         }
-        const data = await response.json();
-        renderGuides(data);
-    } catch (error) {
-        console.error("Error fetching legal guides:", error);
-        container.innerHTML = "<p>Unable to load legal guides. Please try refreshing.</p>";
-    }
-}
-
-function renderGuides(guides) {
-    const container = document.getElementById("guides-container");
-    container.innerHTML = "";
-
-    Object.keys(guides).forEach(key => {
-        const item = guides[key];
-        const card = document.createElement("div");
-        card.className = "guide-card";
-
-        card.innerHTML = `
-            <h3>${item.category}</h3>
-            <div class="act-badge">${item.act}</div>
-            <div class="steps-content">${item.sms_details}</div>
-        `;
-
-        container.appendChild(card);
     });
-}
+});

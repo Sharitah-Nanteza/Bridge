@@ -1,14 +1,19 @@
 import os
-import google.generativeai as genai
 from flask import Flask, render_template, jsonify, request
 from dotenv import load_dotenv
+from google import genai
 from routes.ussd import ussd_bp
 
 load_dotenv()
 
-# Configure Gemini AI
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-1.5-flash')
+# Initialize Google GenAI Client
+api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+
+if api_key:
+    client = genai.Client(api_key=api_key)
+else:
+    client = None
+    print("Warning: GEMINI_API_KEY is missing in your .env file!")
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.register_blueprint(ussd_bp)
@@ -17,28 +22,34 @@ app.register_blueprint(ussd_bp)
 def home():
     return render_template('index.html')
 
-# Interactive Inquiry Endpoint (Haki-style Help)
+# Interactive Inquiry Endpoint
 @app.route('/api/ask', methods=['POST'])
 def ask_assistant():
-    data = request.get_json()
+    if not client:
+        return jsonify({"error": "API Key is missing on the server."}), 500
+
+    data = request.get_json() or {}
     user_query = data.get("question", "").strip()
 
     if not user_query:
-        return jsonify({"error": "Please ask a question."}), 400
+        return jsonify({"error": "Please provide a valid question."}), 400
 
     prompt = f"""
     You are Bridge AI, an expert digital safety & rights assistant for Uganda.
-    Answer the user's issue with actionable steps, grounding your advice in relevant laws 
-    such as the Computer Misuse Act or Data Protection and Privacy Act 2019.
+    Answer the user's issue with clear, practical steps and ground your advice 
+    in relevant Ugandan laws (such as the Computer Misuse Act or Data Protection and Privacy Act 2019).
     
     User Inquiry: {user_query}
     """
 
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-3.6-flash',
+            contents=prompt
+        )
         return jsonify({"reply": response.text})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Failed to reach Gemini AI: {str(e)}"}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

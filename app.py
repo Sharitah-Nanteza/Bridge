@@ -1,4 +1,5 @@
 import os
+import africastalking
 from flask import Flask, render_template, request, jsonify
 from google import genai
 from dotenv import load_dotenv
@@ -10,7 +11,16 @@ app = Flask(__name__)
 # Initialize the official Google GenAI Client
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-# Model set to gemini-3.6-flash
+# Initialize Africa's Talking for offline SMS follow-ups
+AT_USERNAME = os.getenv("AT_USERNAME", "sandbox")
+AT_API_KEY = os.getenv("AT_API_KEY", "")
+
+if AT_API_KEY:
+    africastalking.initialize(AT_USERNAME, AT_API_KEY)
+    sms = africastalking.SMS
+else:
+    sms = None
+
 MODEL_ID = "gemini-3.6-flash"
 
 LANGUAGES = {
@@ -54,8 +64,8 @@ def web_query():
         return jsonify({"error": "Query cannot be empty"}), 400
 
     try:
-        prompt = f"""You are Bridge, an interactive legal and digital safety assistant.
-Provide 3 to 4 direct, actionable steps for the user's issue.
+        prompt = f"""You are Bridge, an interactive legal and digital safety assistant based in Uganda.
+Provide 3 to 4 direct, actionable steps for the user's issue based strictly on Ugandan law, safety guidelines, and relevant authorities (e.g., Uganda Police Cybercrime Unit, Uganda Law Society Legal Aid, PDPO).
 
 CRITICAL INSTRUCTIONS:
 1. Keep the entire response under 100 words.
@@ -63,7 +73,7 @@ CRITICAL INSTRUCTIONS:
 3. Use plain sentences and simple numbers (1, 2, 3) so it sounds natural when read aloud.
 4. Reply strictly in this language: {target_language}.
 
-User Issue: {user_query}"""
+User Issue (Uganda context): {user_query}"""
 
         response = client.models.generate_content(
             model=MODEL_ID,
@@ -80,12 +90,13 @@ User Issue: {user_query}"""
 @app.route("/ussd", methods=["POST"])
 def ussd_callback():
     session_id = request.values.get("sessionId", "")
+    phone_number = request.values.get("phoneNumber", "")
     text = request.values.get("text", "")
 
     inputs = text.split("*") if text else []
 
     if text == "":
-        response_text = "CON Welcome to Bridge / Londa Olulimi:\n" \
+        response_text = "CON Welcome to Bridge Uganda / Londa Olulimi:\n" \
                         "1. English\n" \
                         "2. Luganda\n" \
                         "3. Swahili\n" \
@@ -110,8 +121,9 @@ def ussd_callback():
         selected_language = sessions.get(session_id, "English")
 
         try:
-            prompt = f"""You are Bridge, a legal and digital safety assistant.
+            prompt = f"""You are Bridge, a legal and digital safety assistant for Uganda.
 The user is accessing via USSD. Keep your answer brief and clear (under 140 characters).
+Refer strictly to Ugandan safety steps or contact options if necessary.
 Reply strictly in this language: {selected_language}.
 User Issue: {user_query}"""
 
@@ -119,7 +131,16 @@ User Issue: {user_query}"""
                 model=MODEL_ID,
                 contents=prompt
             )
-            response_text = f"END {res.text}"
+            answer = res.text.strip()
+            response_text = f"END {answer}"
+
+            # Send SMS copy for offline reference
+            if sms and phone_number:
+                try:
+                    sms.send(f"Bridge Advice (Uganda): {answer}\nHelplines: Police 999, Legal Aid 0800100150", [phone_number])
+                except Exception as sms_err:
+                    print(f"SMS Error: {sms_err}")
+
         except Exception as e:
             print(f"USSD Gemini Error: {e}")
             response_text = "END Sorry, an error occurred. Please try again later."

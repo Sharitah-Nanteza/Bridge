@@ -158,16 +158,42 @@ function playVoice(text, langCode) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
 
+    // Get all available system/browser voices
+    const voices = window.speechSynthesis.getVoices();
+
+    // Map requested languages to African regional voice codes
     const voiceLocales = {
-        en: "en-US",
-        sw: "sw-KE",
-        lg: "en-UG",
-        nyn: "en-UG",
-        lgg: "en-UG",
-        ach: "en-UG"
+        en: "en-ZA", // South African English (sounds much more natural in an African context)
+        sw: "sw-KE", // Kenyan Swahili voice (available on Chrome/Android)
+        lg: "en-ZA", // Fallback to African English accent for local languages
+        nyn: "en-ZA",
+        lgg: "en-ZA",
+        ach: "en-ZA"
     };
 
-    utterance.lang = voiceLocales[langCode] || "en-US";
-    utterance.rate = 0.95;
+    const targetLang = voiceLocales[langCode] || "en-ZA";
+
+    // Try to find a voice that matches the African locale
+    const africanVoice = voices.find(voice => 
+        voice.lang.includes(targetLang) || 
+        voice.lang.includes("sw") || 
+        voice.name.toLowerCase().includes("african") ||
+        voice.name.toLowerCase().includes("kenya") ||
+        voice.name.toLowerCase().includes("south africa")
+    );
+
+    if (africanVoice) {
+        utterance.voice = africanVoice;
+    }
+
+    utterance.lang = targetLang;
+    utterance.rate = 0.90; // Slightly slower speed for clearer local pronunciation
+    utterance.pitch = 1.0;
+
     window.speechSynthesis.speak(utterance);
+}
+
+// Ensure voices are loaded before user clicks (required by Chrome)
+if (typeof speechSynthesis !== "undefined" && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 }

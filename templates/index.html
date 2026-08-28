@@ -28,6 +28,14 @@
         .escalation-box { background-color: #fff8e6; border: 1px solid #fce8b2; border-radius: 8px; padding: 16px; margin-top: 20px; font-size: 0.9rem; color: #744210; }
         .escalation-box h4 { margin-bottom: 6px; color: #975a16; }
         .escalation-box ul { margin-left: 18px; margin-top: 6px; }
+        .scam-tools { border-top: 1px solid #e5e7eb; margin-top: 28px; padding-top: 22px; }
+        .scam-tools h3 { margin-bottom: 8px; }
+        .scam-tools p { color: #666; font-size: 0.95rem; margin-bottom: 12px; }
+        .scam-actions { display: flex; gap: 10px; }
+        .scam-actions button { flex: 1; padding: 11px; border: 0; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .btn-check { background: #0f766e; color: white; }
+        .btn-report { background: #fef3c7; color: #92400e; }
+        .scam-result { margin-top: 14px; padding: 14px; border-radius: 8px; background: #f0fdfa; border: 1px solid #99f6e4; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -85,6 +93,24 @@
 
             <button type="submit" id="submitBtn" class="btn-primary">Get Legal Assistance</button>
         </form>
+
+        <section class="scam-tools" aria-labelledby="scamHeading">
+            <h3 id="scamHeading">Check a suspicious number</h3>
+            <p>Look up reports or add your experience to help protect others.</p>
+            <div class="form-group">
+                <label for="scamNumber">Phone number</label>
+                <input id="scamNumber" class="form-control" type="tel" placeholder="e.g. +256 700 123456">
+            </div>
+            <div class="form-group">
+                <label for="scamReason">Report reason (required only when reporting)</label>
+                <input id="scamReason" class="form-control" type="text" placeholder="e.g. Asked for my mobile money PIN">
+            </div>
+            <div class="scam-actions">
+                <button class="btn-check" type="button" onclick="checkScamNumber()">Check number</button>
+                <button class="btn-report" type="button" onclick="reportScamNumber()">Report number</button>
+            </div>
+            <div id="scamResult" class="scam-result" role="status" hidden></div>
+        </section>
 
         <!-- Dynamic Output Box -->
         <div id="responseBox" class="response-card" style="display: none;"></div>
@@ -275,6 +301,55 @@
             document.getElementById("resetBtn").style.display = "none";
             document.getElementById("escalationBox").style.display = "none";
             window.speechSynthesis.cancel();
+        }
+
+        function scamPayload() {
+            return {
+                number: document.getElementById("scamNumber").value.trim(),
+                reason: document.getElementById("scamReason").value.trim()
+            };
+        }
+
+        function showScamResult(message) {
+            const result = document.getElementById("scamResult");
+            result.hidden = false;
+            result.innerHTML = message;
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>'"]/g, character => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+            })[character]);
+        }
+
+        async function checkScamNumber() {
+            const payload = scamPayload();
+            if (!payload.number) return showScamResult("Enter a phone number first.");
+            try {
+                const response = await fetch("/api/scams/check", {
+                    method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) return showScamResult(data.error);
+                const reasons = data.reasons.length ? `<br>Recent reasons: ${data.reasons.map(escapeHtml).join("; ")}` : "";
+                showScamResult(`<strong>Risk: ${escapeHtml(data.risk_level.toUpperCase())}</strong><br>Reports: ${data.report_count}${reasons}<br>${data.flags.map(escapeHtml).join("<br>")}`);
+            } catch (error) {
+                showScamResult("Could not check the number. Please try again.");
+            }
+        }
+
+        async function reportScamNumber() {
+            const payload = scamPayload();
+            if (!payload.number || !payload.reason) return showScamResult("Enter both a phone number and a reason.");
+            try {
+                const response = await fetch("/api/scams/report", {
+                    method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                showScamResult(response.ok ? `Report saved for ${data.number}. Thank you for helping others stay safe.` : data.error);
+            } catch (error) {
+                showScamResult("Could not save the report. Please try again.");
+            }
         }
 
         function playVoice(text, langCode) {

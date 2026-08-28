@@ -3,6 +3,7 @@ import africastalking
 from flask import Flask, render_template, request, jsonify
 from google import genai
 from dotenv import load_dotenv
+from scamdb import check_number, normalize_number, report_number
 
 load_dotenv()
 
@@ -83,6 +84,25 @@ User Issue (Uganda context): {user_query}"""
     except Exception as e:
         print(f"Gemini API Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/scams/check", methods=["POST"])
+def check_scam_number():
+    data = request.get_json() or {}
+    number = normalize_number(data.get("number", ""))
+    if not number:
+        return jsonify({"error": "A phone number is required"}), 400
+    return jsonify(check_number(number))
+
+
+@app.route("/api/scams/report", methods=["POST"])
+def report_scam_number():
+    data = request.get_json() or {}
+    number = normalize_number(data.get("number", ""))
+    reason = (data.get("reason") or "").strip()
+    if not number or not reason:
+        return jsonify({"error": "A phone number and reason are required"}), 400
+    return jsonify(report_number(number, reason, (data.get("reporter") or "").strip() or None)), 201
 
 # ==========================================
 # 3. USSD ENDPOINT (Africa's Talking Callback)

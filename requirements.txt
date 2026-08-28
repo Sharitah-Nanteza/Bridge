@@ -1,6 +1,6 @@
-flask==3.0.2
+Flask==3.0.2
 africastalking==1.2.5
 python-dotenv==1.0.1
 requests==2.31.0
 gunicorn==21.2.0
-google-generativeai
+google-genai

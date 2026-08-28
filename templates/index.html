@@ -1,108 +1,395 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bridge | Digital Safety Assistant (Uganda)</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: #f4f6f8; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background: #ffffff; max-width: 600px; width: 100%; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 30px; }
-        .header { display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 1.8rem; color: #1a1a1a; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
-        .header p { color: #666; font-size: 0.95rem; }
-        .btn-refresh { background: none; border: 1px solid #d0d7de; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; color: #555; }
-        .btn-refresh:hover { background-color: #f3f4f6; }
-        .banner { background-color: #eef4ff; border: 1px solid #d0e1fd; color: #1e40af; padding: 12px 16px; border-radius: 8px; margin-top: 16px; font-size: 0.95rem; line-height: 1.4; }
-        .form-group { display: flex; flex-direction: column; margin-bottom: 16px; }
-        .form-group label { font-size: 0.95rem; margin-bottom: 6px; color: #222; }
-        .form-control { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; outline: none; }
-        .form-control:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
-        textarea.form-control { resize: vertical; min-height: 100px; }
-        .btn-primary { width: 100%; padding: 14px; background-color: #2563eb; color: #ffffff; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; }
-        .btn-primary:hover { background-color: #1d4ed8; }
-        .btn-primary:disabled { background-color: #93c5fd; cursor: not-allowed; }
-        .btn-secondary { background-color: #f3f4f6; color: #374151; border: 1px solid #d1d5db; padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-top: 12px; width: 100%; }
-        .btn-secondary:hover { background-color: #e5e7eb; }
-        .response-card { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; font-size: 0.98rem; line-height: 1.6; color: #1f2937; margin-top: 20px; }
-        .escalation-box { background-color: #fff8e6; border: 1px solid #fce8b2; border-radius: 8px; padding: 16px; margin-top: 20px; font-size: 0.9rem; color: #744210; }
-        .escalation-box h4 { margin-bottom: 6px; color: #975a16; }
-        .escalation-box ul { margin-left: 18px; margin-top: 6px; }
+        :root {
+            --bg-start: #f1fbf8;
+            /* lighter teal background */
+            --bg-end: #e8f7f3;
+            --panel: #ffffff;
+            --accent: #14bfa6;
+            --muted: #5b6f6e;
+            --text: #05342f;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--bg-start), var(--bg-end));
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .container {
+            background: var(--panel);
+            max-width: 720px;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(12, 38, 36, 0.06);
+            padding: 14px;
+            border: 1px solid rgba(3, 36, 34, 0.04);
+            overflow: hidden;
+        }
+
+        .layout {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .sidebar {
+            width: 180px;
+            background: transparent;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.02rem;
+            color: var(--text);
+        }
+
+        .sidebar-header p {
+            color: var(--muted);
+            font-size: 0.82rem;
+            margin-top: 4px;
+        }
+
+        .nav {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            text-align: left;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text);
+            font-size: 0.9rem;
+            border: none;
+        }
+
+        .nav-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .main {
+            flex: 1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header p {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .btn-refresh {
+            background: transparent;
+            border: 1px solid rgba(3, 36, 34, 0.06);
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            color: var(--text);
+        }
+
+        .banner {
+            background: rgba(15, 159, 139, 0.06);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 8px 12px;
+            margin-top: 10px;
+            font-size: 0.88rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            font-size: 0.88rem;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(3, 36, 34, 0.06);
+            border-radius: 6px;
+            font-size: 0.92rem;
+            background: white;
+            color: var(--text);
+        }
+
+        textarea.form-control {
+            min-height: 80px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid rgba(3, 36, 34, 0.06);
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+        }
+
+        .response-card {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.95rem;
+            color: var(--text);
+            margin-top: 12px;
+            border: 1px solid rgba(3, 36, 34, 0.04);
+        }
+
+        .escalation-box {
+            background: rgba(255, 246, 230, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.84rem;
+            color: var(--text);
+        }
+
+        .scam-tools {
+            border-top: 1px solid rgba(3, 36, 34, 0.04);
+            margin-top: 12px;
+            padding-top: 10px;
+        }
+
+        .scam-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-check {
+            background: transparent;
+            border: 1px solid rgba(3, 36, 34, 0.06);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .btn-report {
+            background: var(--accent);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        .scam-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f1fff9;
+            border: 1px solid rgba(3, 36, 34, 0.04);
+            color: var(--text);
+        }
+
+        /* Make layout fit within smaller screens */
+        @media (max-width: 900px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                display: flex;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <!-- Header with Suspension Bridge & Safety SVG Logo -->
-        <div class="header">
-            <div>
-                <h1>
-                    <!-- Bridge Icon: Suspension Cables & Pillars -->
-                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <!-- Left & Right Bridge Pillars -->
-                        <path d="M4 20V9" />
-                        <path d="M20 20V9" />
-                        <!-- Main Bridge Arch / Roadway -->
-                        <path d="M2 17h20" />
-                        <!-- Suspension Cables -->
-                        <path d="M4 9c4 6 12 6 16 0" />
-                        <path d="M8 12v5" />
-                        <path d="M12 13.5v3.5" />
-                        <path d="M16 12v5" />
-                    </svg>
-                    Bridge
-                </h1>
-                <p id="tagline">Uganda Digital Safety & Rights Assistant</p>
-            </div>
-            <button class="btn-refresh" onclick="resetPage()">🔄 Refresh</button>
-        </div>
+        <div class="layout">
+            <!-- Sidebar -->
+            <aside class="sidebar" role="navigation" aria-label="Main navigation">
+                <div class="sidebar-header">
+                    <h2>Bridge</h2>
+                    <p>Digital Safety</p>
+                </div>
+                <nav class="nav">
+                    <button class="nav-item active" data-target="legalSection" onclick="showSection('legalSection')">1.
+                        Legal & Safety Assistance</button>
+                    <button class="nav-item" data-target="reportSection" onclick="showSection('reportSection')">2.
+                        Report Fraud / Scam</button>
+                    <button class="nav-item" data-target="exploreSection" onclick="showSection('exploreSection')">3.
+                        Explore Digital World</button>
+                </nav>
+            </aside>
 
-        <!-- USSD Banner -->
-        <div class="banner">
-            📱 <span id="ussdText">No Internet? Dial <strong>*384*123#</strong> on any phone in Uganda to access this helpline via USSD!</span>
-        </div>
+            <!-- Main content -->
+            <main class="main">
+                <!-- Header with Suspension Bridge & Safety SVG Logo -->
+                <div class="header">
+                    <div>
+                        <h1>
+                            <!-- Bridge Icon: Suspension Cables & Pillars -->
+                            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#9eeadf"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <!-- Left & Right Bridge Pillars -->
+                                <path d="M4 20V9" />
+                                <path d="M20 20V9" />
+                                <!-- Main Bridge Arch / Roadway -->
+                                <path d="M2 17h20" />
+                                <!-- Suspension Cables -->
+                                <path d="M4 9c4 6 12 6 16 0" />
+                                <path d="M8 12v5" />
+                                <path d="M12 13.5v3.5" />
+                                <path d="M16 12v5" />
+                            </svg>
+                            Bridge
+                        </h1>
+                        <p id="tagline">Uganda Digital Safety & Rights Assistant</p>
+                    </div>
+                    <button class="btn-refresh" onclick="resetPage()">🔄 Refresh</button>
+                </div>
 
-        <form id="queryForm" style="margin-top: 20px;">
-            <!-- Language Dropdown -->
-            <div class="form-group">
-                <label for="languageSelect" id="langLabel" style="font-weight: bold;">Preferred Language:</label>
-                <select id="languageSelect" class="form-control" style="margin-top: 6px;" onchange="updateLanguage(this.value)">
-                    <option value="en">English (Uganda)</option>
-                    <option value="lg">Luganda</option>
-                    <option value="sw">Kiswahili</option>
-                    <option value="nyn">Runyankole / Rukiga</option>
-                    <option value="lgg">Lugbara</option>
-                    <option value="ach">Acholi (Luo)</option>
-                </select>
-            </div>
+                <!-- USSD Banner -->
+                <div class="banner">
+                    📱 <span id="ussdText">No Internet? Dial <strong>*384*123#</strong> on any phone in Uganda to access
+                        this helpline via USSD!</span>
+                </div>
 
-            <!-- Query Section -->
-            <h3 id="sectionHeading" style="margin-top: 16px;">Ask for Legal & Safety Help</h3>
-            <p id="sectionSubheading" style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">Describe your issue in Uganda (e.g., mobile money scam, online harassment, privacy violation):</p>
-            
-            <div class="form-group">
-                <textarea id="queryInput" class="form-control" rows="4" placeholder="Describe your issue here..."></textarea>
-            </div>
+                <section id="legalSection">
+                    <form id="queryForm" style="margin-top: 20px;">
+                        <!-- Language Dropdown -->
+                        <div class="form-group">
+                            <label for="languageSelect" id="langLabel" style="font-weight: bold;">Preferred
+                                Language:</label>
+                            <select id="languageSelect" class="form-control" style="margin-top: 6px;"
+                                onchange="updateLanguage(this.value)">
+                                <option value="en">English (Uganda)</option>
+                                <option value="lg">Luganda</option>
+                                <option value="sw">Kiswahili</option>
+                                <option value="nyn">Runyankole / Rukiga</option>
+                                <option value="lgg">Lugbara</option>
+                                <option value="ach">Acholi (Luo)</option>
+                            </select>
+                        </div>
 
-            <button type="submit" id="submitBtn" class="btn-primary">Get Legal Assistance</button>
-        </form>
+                        <!-- Query Section -->
+                        <h3 id="sectionHeading" style="margin-top: 16px;">Ask for Legal & Safety Help</h3>
+                        <p id="sectionSubheading" style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">Describe
+                            your issue in Uganda (e.g., mobile money scam, online harassment, privacy violation):</p>
 
-        <!-- Dynamic Output Box -->
-        <div id="responseBox" class="response-card" style="display: none;"></div>
+                        <div class="form-group">
+                            <textarea id="queryInput" class="form-control" rows="4"
+                                placeholder="Describe your issue here..."></textarea>
+                        </div>
 
-        <!-- Navigation & Reset Option -->
-        <button id="resetBtn" type="button" class="btn-secondary" style="display: none;" onclick="resetPage()">
-            💬 Ask Another Question
-        </button>
+                        <button type="submit" id="submitBtn" class="btn-primary">Get Legal Assistance</button>
+                    </form>
+                </section>
 
-        <!-- Uganda Emergency & Escalation Box -->
-        <div id="escalationBox" class="escalation-box" style="display: none;">
-            <h4 id="helpHeading">🚨 Uganda Immediate Contacts & Escalation</h4>
-            <p id="helpText">If you are in danger or need formal legal/police filing in Uganda:</p>
-            <ul>
-                <li><strong>Uganda Police Cybercrime Unit:</strong> Toll-Free 999 / 112</li>
-                <li><strong>Uganda Law Society Legal Aid:</strong> +256 800 100 150</li>
-                <li><strong>Mobile Money Fraud Blocking:</strong> Dial *185# (MTN Uganda) or *160# (Airtel Uganda) immediately.</li>
-            </ul>
+                <section id="reportSection" class="scam-tools" aria-labelledby="scamHeading" style="display:none;">
+                    <h3 id="scamHeading">Check a suspicious number</h3>
+                    <p>Look up reports or add your experience to help protect others.</p>
+                    <div class="form-group">
+                        <label for="scamNumber">Phone number</label>
+                        <input id="scamNumber" class="form-control" type="tel" placeholder="e.g. +256 700 123456">
+                    </div>
+                    <div class="form-group">
+                        <label for="scamReason">Report reason (required only when reporting)</label>
+                        <input id="scamReason" class="form-control" type="text"
+                            placeholder="e.g. Asked for my mobile money PIN">
+                    </div>
+                    <div class="scam-actions">
+                        <button class="btn-check" type="button" onclick="checkScamNumber()">Check number</button>
+                        <button class="btn-report" type="button" onclick="reportScamNumber()">Report number</button>
+                    </div>
+                    <div id="scamResult" class="scam-result" role="status" hidden></div>
+                </section>
+
+                <section id="exploreSection" style="display:none; margin-top: 20px;">
+                    <h3>Explore Digital World</h3>
+                    <p style="color:#666;">Learn practical tips to stay safe online and with mobile money.</p>
+                    <div style="display:flex; gap:10px; flex-direction:column; max-width:560px;">
+                        <button class="btn-secondary" type="button" onclick="sendExploreSms(1)">Safe mobile money
+                            tips</button>
+                        <button class="btn-secondary" type="button" onclick="sendExploreSms(2)">Common scams
+                            explained</button>
+                        <button class="btn-secondary" type="button" onclick="sendExploreSms(3)">Rights &
+                            resources</button>
+                    </div>
+                </section>
+
+                <!-- Dynamic Output Box -->
+                <div id="responseBox" class="response-card" style="display: none;"></div>
+
+                <!-- Navigation & Reset Option -->
+                <button id="resetBtn" type="button" class="btn-secondary" style="display: none;" onclick="resetPage()">
+                    💬 Ask Another Question
+                </button>
+
+                <!-- Uganda Emergency & Escalation Box -->
+                <div id="escalationBox" class="escalation-box" style="display: none;">
+                    <h4 id="helpHeading">🚨 Uganda Immediate Contacts & Escalation</h4>
+                    <p id="helpText">If you are in danger or need formal legal/police filing in Uganda:</p>
+                    <ul>
+                        <li><strong>Uganda Police Cybercrime Unit:</strong> Toll-Free 999 / 112</li>
+                        <li><strong>Uganda Law Society Legal Aid:</strong> +256 800 100 150</li>
+                        <li><strong>Mobile Money Fraud Blocking:</strong> Dial *185# (MTN Uganda) or *160# (Airtel
+                            Uganda) immediately.</li>
+                    </ul>
+                </div>
+            </main>
         </div>
     </div>
 
@@ -214,7 +501,7 @@
             }
         }
 
-        document.getElementById("queryForm").addEventListener("submit", async function(e) {
+        document.getElementById("queryForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
             const queryInput = document.getElementById("queryInput");
@@ -254,7 +541,7 @@
                     `;
 
                     document.getElementById("speakBtn").onclick = () => playVoice(data.answer, langCode);
-                    
+
                     resetBtn.style.display = "block";
                     escalationBox.style.display = "block";
                 } else {
@@ -275,6 +562,55 @@
             document.getElementById("resetBtn").style.display = "none";
             document.getElementById("escalationBox").style.display = "none";
             window.speechSynthesis.cancel();
+        }
+
+        function scamPayload() {
+            return {
+                number: document.getElementById("scamNumber").value.trim(),
+                reason: document.getElementById("scamReason").value.trim()
+            };
+        }
+
+        function showScamResult(message) {
+            const result = document.getElementById("scamResult");
+            result.hidden = false;
+            result.innerHTML = message;
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>'"]/g, character => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+            })[character]);
+        }
+
+        async function checkScamNumber() {
+            const payload = scamPayload();
+            if (!payload.number) return showScamResult("Enter a phone number first.");
+            try {
+                const response = await fetch("/api/scams/check", {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) return showScamResult(data.error);
+                const reasons = data.reasons.length ? `<br>Recent reasons: ${data.reasons.map(escapeHtml).join("; ")}` : "";
+                showScamResult(`<strong>Risk: ${escapeHtml(data.risk_level.toUpperCase())}</strong><br>Reports: ${data.report_count}${reasons}<br>${data.flags.map(escapeHtml).join("<br>")}`);
+            } catch (error) {
+                showScamResult("Could not check the number. Please try again.");
+            }
+        }
+
+        async function reportScamNumber() {
+            const payload = scamPayload();
+            if (!payload.number || !payload.reason) return showScamResult("Enter both a phone number and a reason.");
+            try {
+                const response = await fetch("/api/scams/report", {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                showScamResult(response.ok ? `Report saved for ${data.number}. Thank you for helping others stay safe.` : data.error);
+            } catch (error) {
+                showScamResult("Could not save the report. Please try again.");
+            }
         }
 
         function playVoice(text, langCode) {
@@ -299,6 +635,41 @@
             utterance.rate = 0.90;
             window.speechSynthesis.speak(utterance);
         }
+
+        // Navigation: show one of the main sections and update active sidebar state
+        function showSection(id) {
+            const sections = ['legalSection', 'reportSection', 'exploreSection'];
+            sections.forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.style.display = (s === id) ? 'block' : 'none';
+            });
+            // Update sidebar active state
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.target === id);
+            });
+            // focus first input in the shown section
+            if (id === 'legalSection') document.getElementById('queryInput').focus();
+            if (id === 'reportSection') document.getElementById('scamNumber').focus();
+        }
+
+        // Explore actions: show quick guidance in the response box and scroll into view
+        function sendExploreSms(choice) {
+            const responseBox = document.getElementById('responseBox');
+            const t = uiTranslations[document.getElementById('languageSelect').value] || uiTranslations.en;
+            let msg = '';
+            if (choice === 1) {
+                msg = 'Safe Tips: Never share PINs or OTPs. Verify callers before sending money.';
+            } else if (choice === 2) {
+                msg = 'Common Scams: Prize, impersonation, SIM swap, fake agents. Preserve evidence and report.';
+            } else {
+                msg = 'Resources: You have rights under the Data Protection & Privacy Act. Contact PDPO or the Police Cybercrime Unit for help.';
+            }
+            responseBox.style.display = 'block';
+            responseBox.innerHTML = `<strong>Explore:</strong><br>${msg}`;
+            document.getElementById('escalationBox').style.display = 'block';
+            window.scrollTo({ top: responseBox.offsetTop - 20, behavior: 'smooth' });
+        }
     </script>
 </body>
+
 </html>

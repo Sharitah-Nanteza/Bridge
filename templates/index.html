@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,26 +7,19 @@
     <style>
         :root {
             --bg-start: #f1fbf8;
-            /* lighter teal background */
             --bg-end: #e8f7f3;
             --panel: #ffffff;
             --accent: #14bfa6;
             --muted: #5b6f6e;
             --text: #05342f;
         }
-
-        html,
-        body {
-            height: 100%;
-        }
-
+        html, body { height: 100%; }
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
         }
-
         body {
             background: linear-gradient(180deg, var(--bg-start), var(--bg-end));
             color: var(--text);
@@ -36,7 +28,6 @@
             align-items: center;
             padding: 12px;
         }
-
         .container {
             background: var(--panel);
             max-width: 720px;
@@ -47,248 +38,137 @@
             border: 1px solid rgba(3, 36, 34, 0.04);
             overflow: hidden;
         }
-
-        .layout {
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-        }
-
-        .sidebar {
-            width: 180px;
-            background: transparent;
-            border-radius: 8px;
-            padding: 8px;
-        }
-
-        .sidebar-header h2 {
-            margin: 0;
-            font-size: 1.02rem;
-            color: var(--text);
-        }
-
-        .sidebar-header p {
-            color: var(--muted);
-            font-size: 0.82rem;
-            margin-top: 4px;
-        }
-
-        .nav {
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
+        .layout { display: flex; gap: 12px; align-items: flex-start; }
+        .sidebar { width: 180px; background: #0f5f57; border-radius: 8px; padding: 12px; color: white; }
+        .sidebar-header h2 { margin: 0; font-size: 1.1rem; color: white; font-weight: 700; }
+        .sidebar-header p { color: #9eeadf; font-size: 0.75rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .nav { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
         .nav-item {
-            text-align: left;
-            padding: 8px 10px;
-            border-radius: 8px;
-            background: transparent;
-            cursor: pointer;
-            font-weight: 700;
-            color: var(--text);
-            font-size: 0.9rem;
-            border: none;
+            text-align: left; padding: 10px 12px; border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1); cursor: pointer; font-weight: 600;
+            color: white; font-size: 0.88rem; border: none; transition: all 0.2s ease;
         }
-
-        .nav-item.active {
-            background: var(--accent);
-            color: white;
-        }
-
-        .main {
-            flex: 1;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-size: 1.3rem;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header p {
-            color: var(--muted);
-            font-size: 0.85rem;
-        }
-
+        .nav-item:hover { background: rgba(255, 255, 255, 0.15); }
+        .nav-item.active { background: #14bfa6; color: white; font-weight: 700; }
+        .main { flex: 1; min-width: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.3rem; color: var(--text); display: flex; align-items: center; gap: 10px; }
+        .header p { color: var(--muted); font-size: 0.85rem; }
         .btn-refresh {
-            background: transparent;
-            border: 1px solid rgba(3, 36, 34, 0.06);
-            padding: 6px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.82rem;
-            color: var(--text);
+            background: transparent; border: 1px solid rgba(3, 36, 34, 0.06);
+            padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; color: var(--text);
         }
+        .banner { background: rgba(15, 159, 139, 0.06); border-radius: 8px; color: var(--text); padding: 8px 12px; margin-top: 10px; font-size: 0.88rem; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
+        .form-group label { font-size: 0.88rem; margin-bottom: 6px; color: var(--text); }
+        .form-control { width: 100%; padding: 10px; border: 1px solid rgba(3, 36, 34, 0.06); border-radius: 6px; font-size: 0.92rem; background: white; color: var(--text); }
+        textarea.form-control { min-height: 80px; }
+        .btn-primary { width: 100%; padding: 10px; background-color: var(--accent); color: white; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-secondary { background: transparent; color: var(--text); border: 1px solid rgba(3, 36, 34, 0.06); padding: 9px 12px; border-radius: 8px; font-size: 0.88rem; cursor: pointer; }
+        .response-card { background: white; border-radius: 8px; padding: 12px; font-size: 0.95rem; color: var(--text); margin-top: 12px; border: 1px solid rgba(3, 36, 34, 0.04); }
+        .escalation-box { background: rgba(255, 246, 230, 0.9); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 0.84rem; color: var(--text); }
+        .scam-tools { border-top: 1px solid rgba(3, 36, 34, 0.04); margin-top: 12px; padding-top: 10px; }
+        .scam-actions { display: flex; gap: 8px; }
+        .btn-check { background: transparent; border: 1px solid rgba(3, 36, 34, 0.06); padding: 10px; border-radius: 8px; cursor: pointer; }
+        .btn-report { background: var(--accent); color: white; padding: 10px; border-radius: 8px; border: none; cursor: pointer; }
+        .scam-result { margin-top: 10px; padding: 10px; border-radius: 8px; background: #f1fff9; border: 1px solid rgba(3, 36, 34, 0.04); color: var(--text); }
 
-        .banner {
-            background: rgba(15, 159, 139, 0.06);
-            border-radius: 8px;
-            color: var(--text);
-            padding: 8px 12px;
-            margin-top: 10px;
-            font-size: 0.88rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 10px;
-        }
-
-        .form-group label {
-            font-size: 0.88rem;
-            margin-bottom: 6px;
-            color: var(--text);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid rgba(3, 36, 34, 0.06);
-            border-radius: 6px;
-            font-size: 0.92rem;
-            background: white;
-            color: var(--text);
-        }
-
-        textarea.form-control {
-            min-height: 80px;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 10px;
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--text);
-            border: 1px solid rgba(3, 36, 34, 0.06);
-            padding: 9px 12px;
-            border-radius: 8px;
-            font-size: 0.88rem;
-        }
-
-        .response-card {
-            background: white;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 0.95rem;
-            color: var(--text);
-            margin-top: 12px;
-            border: 1px solid rgba(3, 36, 34, 0.04);
-        }
-
-        .escalation-box {
-            background: rgba(255, 246, 230, 0.9);
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 0.84rem;
-            color: var(--text);
-        }
-
-        .scam-tools {
-            border-top: 1px solid rgba(3, 36, 34, 0.04);
-            margin-top: 12px;
-            padding-top: 10px;
-        }
-
-        .scam-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-check {
-            background: transparent;
-            border: 1px solid rgba(3, 36, 34, 0.06);
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .btn-report {
-            background: var(--accent);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-        }
-
-        .scam-result {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            background: #f1fff9;
-            border: 1px solid rgba(3, 36, 34, 0.04);
-            color: var(--text);
-        }
-
-        /* Make layout fit within smaller screens */
         @media (max-width: 900px) {
-            .layout {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                display: flex;
-                gap: 10px;
-            }
+            .layout { flex-direction: column; }
+            .sidebar { width: 100%; display: flex; gap: 10px; }
         }
+
+        /* ===== Welcome modal (matches the reference screenshot) ===== */
+        .welcome-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+            padding: 16px;
+        }
+        .welcome-modal {
+            background: white; border-radius: 14px; padding: 32px 28px;
+            max-width: 420px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); text-align: center;
+        }
+        .welcome-icon { font-size: 2.2rem; margin-bottom: 10px; }
+        .welcome-title { font-size: 1.35rem; color: var(--text); margin-bottom: 10px; font-weight: 700; }
+        .welcome-subtitle { color: var(--muted); margin-bottom: 18px; font-size: 0.92rem; line-height: 1.5; }
+        .welcome-lang-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; display: block; }
+        .welcome-controls { display: flex; gap: 10px; margin-top: 18px; }
+        .btn-welcome { flex: 1; padding: 12px 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.92rem; transition: all 0.2s ease; }
+        .btn-voice { background: var(--accent); color: white; }
+        .btn-voice:hover { background: #0f9b87; }
+        .btn-voice.playing { background: #0d7a6d; }
+        .btn-skip { background: white; color: var(--text); border: 1px solid rgba(3, 36, 34, 0.15) !important; }
+        .btn-skip:hover { background: rgba(3, 36, 34, 0.05); }
+        .welcome-transcript {
+            display: none; background: #f5f5f5; border-radius: 8px; padding: 12px; margin-top: 14px;
+            text-align: left; font-size: 0.85rem; color: var(--text); max-height: 130px; overflow-y: auto; line-height: 1.5;
+        }
+        .welcome-transcript.visible { display: block; }
+        .voice-note { font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
+
+        .how-it-works-btn {
+            position: fixed; bottom: 18px; right: 18px; background: #0f5f57; color: white;
+            border: none; padding: 10px 16px; border-radius: 999px; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.18); z-index: 900; display: flex; align-items: center; gap: 6px;
+        }
+        .how-it-works-btn:hover { background: #0c4c46; }
     </style>
 </head>
-
 <body>
+    <div id="welcomeOverlay" class="welcome-overlay">
+        <div class="welcome-modal">
+            <div class="welcome-icon">👋</div>
+            <h2 class="welcome-title" id="welcomeTitle">Welcome to Bridge</h2>
+            <p class="welcome-subtitle" id="welcomeSubtitle">
+                Bridge helps you with legal and digital safety issues in Uganda, like mobile money fraud,
+                online harassment, and privacy. You can listen to this explanation, or skip and read the app yourself.
+            </p>
+
+            <label class="welcome-lang-label" for="welcomeLangSelect">Language / Olulimi</label>
+            <select id="welcomeLangSelect" class="form-control" onchange="updateWelcomeLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="lg">Luganda</option>
+                <option value="sw">Kiswahili</option>
+                <option value="nyn">Runyankole / Rukiga</option>
+                <option value="lgg">Lugbara</option>
+                <option value="ach">Acholi (Luo)</option>
+            </select>
+
+            <div class="welcome-controls">
+                <button class="btn-welcome btn-voice" id="playVoiceBtn" onclick="playWelcomeVoice()">🔊 Listen</button>
+                <button class="btn-welcome btn-skip" onclick="closeWelcome()">Skip, I'll read</button>
+            </div>
+
+            <div class="welcome-transcript" id="welcomeTranscript"></div>
+            <p class="voice-note" id="voiceNote"></p>
+        </div>
+    </div>
+
+    <button class="how-it-works-btn" id="howItWorksBtn" onclick="openWelcome()">🔊 How Bridge Works</button>
+
     <div class="container">
         <div class="layout">
-            <!-- Sidebar -->
             <aside class="sidebar" role="navigation" aria-label="Main navigation">
                 <div class="sidebar-header">
                     <h2>Bridge</h2>
                     <p>Digital Safety</p>
                 </div>
                 <nav class="nav">
-                    <button class="nav-item active" data-target="legalSection" onclick="showSection('legalSection')">1.
-                        Legal & Safety Assistance</button>
-                    <button class="nav-item" data-target="reportSection" onclick="showSection('reportSection')">2.
-                        Report Fraud / Scam</button>
-                    <button class="nav-item" data-target="exploreSection" onclick="showSection('exploreSection')">3.
-                        Explore Digital World</button>
+                    <button class="nav-item active" data-target="legalSection" onclick="showSection('legalSection')">Legal & Safety</button>
+                    <button class="nav-item" data-target="reportSection" onclick="showSection('reportSection')">Report Fraud</button>
+                    <button class="nav-item" data-target="exploreSection" onclick="showSection('exploreSection')">Explore</button>
                 </nav>
             </aside>
-
-            <!-- Main content -->
             <main class="main">
-                <!-- Header with Suspension Bridge & Safety SVG Logo -->
                 <div class="header">
                     <div>
                         <h1>
-                            <!-- Bridge Icon: Suspension Cables & Pillars -->
                             <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#9eeadf"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <!-- Left & Right Bridge Pillars -->
                                 <path d="M4 20V9" />
                                 <path d="M20 20V9" />
-                                <!-- Main Bridge Arch / Roadway -->
                                 <path d="M2 17h20" />
-                                <!-- Suspension Cables -->
                                 <path d="M4 9c4 6 12 6 16 0" />
                                 <path d="M8 12v5" />
                                 <path d="M12 13.5v3.5" />
@@ -301,20 +181,15 @@
                     <button class="btn-refresh" onclick="resetPage()">🔄 Refresh</button>
                 </div>
 
-                <!-- USSD Banner -->
                 <div class="banner">
-                    📱 <span id="ussdText">No Internet? Dial <strong>*384*123#</strong> on any phone in Uganda to access
-                        this helpline via USSD!</span>
+                    📱 <span id="ussdText">No Internet? Dial <strong>*384*123#</strong> on any phone in Uganda to access this helpline via USSD!</span>
                 </div>
 
                 <section id="legalSection">
                     <form id="queryForm" style="margin-top: 20px;">
-                        <!-- Language Dropdown -->
                         <div class="form-group">
-                            <label for="languageSelect" id="langLabel" style="font-weight: bold;">Preferred
-                                Language:</label>
-                            <select id="languageSelect" class="form-control" style="margin-top: 6px;"
-                                onchange="updateLanguage(this.value)">
+                            <label for="languageSelect" id="langLabel" style="font-weight: bold;">Preferred Language:</label>
+                            <select id="languageSelect" class="form-control" style="margin-top: 6px;" onchange="updateLanguage(this.value)">
                                 <option value="en">English (Uganda)</option>
                                 <option value="lg">Luganda</option>
                                 <option value="sw">Kiswahili</option>
@@ -323,17 +198,13 @@
                                 <option value="ach">Acholi (Luo)</option>
                             </select>
                         </div>
-
-                        <!-- Query Section -->
                         <h3 id="sectionHeading" style="margin-top: 16px;">Ask for Legal & Safety Help</h3>
-                        <p id="sectionSubheading" style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">Describe
-                            your issue in Uganda (e.g., mobile money scam, online harassment, privacy violation):</p>
-
+                        <p id="sectionSubheading" style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">
+                            Describe your issue in Uganda (e.g., mobile money scam, online harassment, privacy violation):
+                        </p>
                         <div class="form-group">
-                            <textarea id="queryInput" class="form-control" rows="4"
-                                placeholder="Describe your issue here..."></textarea>
+                            <textarea id="queryInput" class="form-control" rows="4" placeholder="Describe your issue here..."></textarea>
                         </div>
-
                         <button type="submit" id="submitBtn" class="btn-primary">Get Legal Assistance</button>
                     </form>
                 </section>
@@ -347,8 +218,7 @@
                     </div>
                     <div class="form-group">
                         <label for="scamReason">Report reason (required only when reporting)</label>
-                        <input id="scamReason" class="form-control" type="text"
-                            placeholder="e.g. Asked for my mobile money PIN">
+                        <input id="scamReason" class="form-control" type="text" placeholder="e.g. Asked for my mobile money PIN">
                     </div>
                     <div class="scam-actions">
                         <button class="btn-check" type="button" onclick="checkScamNumber()">Check number</button>
@@ -361,32 +231,23 @@
                     <h3>Explore Digital World</h3>
                     <p style="color:#666;">Learn practical tips to stay safe online and with mobile money.</p>
                     <div style="display:flex; gap:10px; flex-direction:column; max-width:560px;">
-                        <button class="btn-secondary" type="button" onclick="sendExploreSms(1)">Safe mobile money
-                            tips</button>
-                        <button class="btn-secondary" type="button" onclick="sendExploreSms(2)">Common scams
-                            explained</button>
-                        <button class="btn-secondary" type="button" onclick="sendExploreSms(3)">Rights &
-                            resources</button>
+                        <button class="btn-secondary" type="button" onclick="sendExploreSms(1)">Safe mobile money tips</button>
+                        <button class="btn-secondary" type="button" onclick="sendExploreSms(2)">Common scams explained</button>
+                        <button class="btn-secondary" type="button" onclick="sendExploreSms(3)">Rights & resources</button>
                     </div>
                 </section>
 
-                <!-- Dynamic Output Box -->
                 <div id="responseBox" class="response-card" style="display: none;"></div>
 
-                <!-- Navigation & Reset Option -->
-                <button id="resetBtn" type="button" class="btn-secondary" style="display: none;" onclick="resetPage()">
-                    💬 Ask Another Question
-                </button>
+                <button id="resetBtn" type="button" class="btn-secondary" style="display: none; margin-top: 10px;" onclick="resetPage()">💬 Ask Another Question</button>
 
-                <!-- Uganda Emergency & Escalation Box -->
                 <div id="escalationBox" class="escalation-box" style="display: none;">
                     <h4 id="helpHeading">🚨 Uganda Immediate Contacts & Escalation</h4>
                     <p id="helpText">If you are in danger or need formal legal/police filing in Uganda:</p>
                     <ul>
                         <li><strong>Uganda Police Cybercrime Unit:</strong> Toll-Free 999 / 112</li>
                         <li><strong>Uganda Law Society Legal Aid:</strong> +256 800 100 150</li>
-                        <li><strong>Mobile Money Fraud Blocking:</strong> Dial *185# (MTN Uganda) or *160# (Airtel
-                            Uganda) immediately.</li>
+                        <li><strong>Mobile Money Fraud Blocking:</strong> Dial *185# (MTN Uganda) or *160# (Airtel Uganda) immediately.</li>
                     </ul>
                 </div>
             </main>
@@ -394,6 +255,164 @@
     </div>
 
     <script>
+        const WELCOME_RATE = 0.78;
+        const ANSWER_RATE = 0.82;
+
+        const voiceLocales = {
+            en: "en-GB",
+            sw: "sw-KE",
+            lg: "en-GB",
+            nyn: "en-GB",
+            lgg: "en-GB",
+            ach: "en-GB"
+        };
+        const APPROX_VOICE_LANGS = new Set(["lg", "nyn", "lgg", "ach"]);
+
+        function pickBestVoice(langCode) {
+            const wanted = voiceLocales[langCode] || "en-GB";
+            const voices = window.speechSynthesis.getVoices();
+            if (!voices.length) return null;
+            return voices.find(v => v.lang === wanted)
+                || voices.find(v => v.lang && v.lang.startsWith(wanted.split('-')[0]))
+                || null;
+        }
+
+        function speak(text, langCode, rate) {
+            if (!("speechSynthesis" in window)) {
+                alert("Text-to-speech is not supported in this browser.");
+                return null;
+            }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = voiceLocales[langCode] || "en-GB";
+            const voice = pickBestVoice(langCode);
+            if (voice) utterance.voice = voice;
+            utterance.rate = rate;
+            window.speechSynthesis.speak(utterance);
+            return utterance;
+        }
+
+        if ("speechSynthesis" in window) {
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+        }
+
+        const welcomeMessages = {
+            en: {
+                title: "Welcome to Bridge",
+                subtitle: "Bridge helps you with legal and digital safety issues in Uganda, like mobile money fraud, online harassment, and privacy. You can listen to this explanation, or skip and read the app yourself.",
+                intro: "Welcome to Bridge, your digital safety and legal rights assistant for Uganda. You can ask for legal advice, check suspicious phone numbers, or learn how to protect yourself online. Choose a language, ask your question, and get instant guidance. You can also dial star three eight four star one two three hash on any phone to access this service without internet."
+            },
+            lg: {
+                title: "Karibu ku Bridge",
+                subtitle: "Bridge ekuyamba mu bizibu by'amateeka n'obukuumi ku mutimbagano mu Uganda, gamba ng'obufere bw'ssente ku ssimu, okutiisibwatiisibwa, n'okutyoboola ebyama. Osobola okuwuliriza ennyonnyola eno, oba okugisubula n'osoma wekka.",
+                intro: "Karibu ku Bridge, omuyambi wo ku by'amateeka n'obukuumi ku mutimbagano mu Uganda. Osobola okubuuza ku by'amateeka, okukwata ku namba z'emiwendo, oba okumanyi engeri y'okwerinda mu mutimbagano. Londa olulimi, kola ekibuuzo kyo, era ufune amagezi ago mu bwangu."
+            },
+            sw: {
+                title: "Karibu kwa Bridge",
+                subtitle: "Bridge inakusaidia na masuala ya kisheria na usalama wa mtandao nchini Uganda, kama vile utapeli wa pesa kwa simu, vitisho mtandaoni, na faragha. Unaweza kusikiliza maelezo haya, au kuruka na kusoma mwenyewe.",
+                intro: "Karibu kwa Bridge, msaidizi wako wa sheria na usalama wa mtandao nchini Uganda. Unaweza kuuliza kwa ushauri wa kisheria, kuangalia namba za simu zinazokamatia, au kujifunza jinsi ya kujilinda mtandaoni. Chagua lugha, uliza swali lako, na pata ushauri haraka."
+            },
+            nyn: {
+                title: "Karibu ku Bridge",
+                subtitle: "Bridge ekukuunga aha bizibu by'amateeka n'obukuumi ku mutimbagano omu Uganda, nk'obufuru bwa ssente, okutinisibwa, n'okusisa ebyama. Osobola kuhurira ekishoboorora eki, nari kugisiiba n'osoma waawe.",
+                intro: "Karibu ku Bridge, omuhabuzi wo ku by'amateeka n'obukuumi ku mutimbagano omu Uganda. Osobola okubuuza ku by'amateeka, okukwata ku namba z'emiwendo, oba okumanyi engeri y'okwerinda mu mutimbagano. Toorana oruhanga, kola ekibuuzo kyo, era ufune amagezi ago mu bwangu."
+            },
+            lgg: {
+                title: "E'do Azi ku Bridge",
+                subtitle: "Bridge konyini o'du azi matu niyia n'amani 'ba Uganda 'dra, mobile money scam, okpo enikani, dede amani 'diyi. Onye eza ongo e'yo 'ni, oba sobiri ti onye onzo mi 'dii.",
+                intro: "E'do azi ku Bridge, konyi o'du matu niyia n'amani 'diyi 'ba Uganda 'dra. Eza onye azi o'du matu niyia, tekeni namba 'ba azi 'fre, oba kana manyi engeri 'ba amani. Sobiri ti, tit peko ni, era kana manyi azi agaara."
+            },
+            ach: {
+                title: "Luong pe Bridge",
+                subtitle: "Bridge konyi i peko me chik dok bedo maber i internet i Uganda, macalo goba me lim i cimu, bwola i internet, dok mung. Iyo tye ki winjo lok man, onyo kelli i kwano kekeni.",
+                intro: "Luong pe Bridge, lakonii me chik dok yub me bedo maber i Uganda. Iyo tye i nyenyo me chik, roto mo me tel yub, onyo manyo yak me bedo maber i internet. Yer leb, peny peko ni, i kanyuc nyenyo yak."
+            }
+        };
+
+        const VOICE_NOTE_APPROX = "Note: an English voice is used to read this language — a fully native voice isn't available in most browsers yet.";
+        const VOICE_NOTE_OK = "";
+
+        let isWelcomePlaying = false;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            syncLanguageControls("en");
+            updateWelcomeLanguage("en");
+            const savedWelcome = sessionStorage.getItem("welcomeSeen");
+            if (savedWelcome) {
+                document.getElementById("welcomeOverlay").style.display = "none";
+            }
+        });
+
+        function syncLanguageControls(langCode) {
+            const mainSelect = document.getElementById("languageSelect");
+            const welcomeSelect = document.getElementById("welcomeLangSelect");
+
+            if (mainSelect && mainSelect.value !== langCode) {
+                mainSelect.value = langCode;
+            }
+            if (welcomeSelect && welcomeSelect.value !== langCode) {
+                welcomeSelect.value = langCode;
+            }
+        }
+
+        function updateWelcomeLanguage(langCode) {
+            const msg = welcomeMessages[langCode] || welcomeMessages.en;
+            document.getElementById("welcomeTitle").innerText = msg.title;
+            document.getElementById("welcomeSubtitle").innerText = msg.subtitle;
+            document.getElementById("welcomeTranscript").innerText = msg.intro;
+            document.getElementById("voiceNote").innerText = APPROX_VOICE_LANGS.has(langCode) ? VOICE_NOTE_APPROX : VOICE_NOTE_OK;
+            syncLanguageControls(langCode);
+        }
+
+        function playWelcomeVoice() {
+            const welcomeSelect = document.getElementById("welcomeLangSelect");
+            const mainSelect = document.getElementById("languageSelect");
+            const langCode = (welcomeSelect && welcomeSelect.value) || (mainSelect && mainSelect.value) || "en";
+            const msg = welcomeMessages[langCode] || welcomeMessages.en;
+            const playBtn = document.getElementById("playVoiceBtn");
+            const transcript = document.getElementById("welcomeTranscript");
+
+            if (isWelcomePlaying) {
+                window.speechSynthesis.cancel();
+                isWelcomePlaying = false;
+                playBtn.innerText = "🔊 Listen";
+                playBtn.classList.remove("playing");
+                return;
+            }
+
+            transcript.classList.add("visible");
+            isWelcomePlaying = true;
+            playBtn.innerText = "⏹ Stop";
+            playBtn.classList.add("playing");
+
+            const utterance = speak(msg.intro, langCode, WELCOME_RATE);
+            if (!utterance) { isWelcomePlaying = false; return; }
+            utterance.onend = function () {
+                isWelcomePlaying = false;
+                playBtn.innerText = "🔊 Listen";
+                playBtn.classList.remove("playing");
+            };
+        }
+
+        function closeWelcome() {
+            sessionStorage.setItem("welcomeSeen", "true");
+            document.getElementById("welcomeOverlay").style.display = "none";
+            window.speechSynthesis.cancel();
+            isWelcomePlaying = false;
+            document.getElementById("queryInput").focus();
+        }
+
+        function openWelcome() {
+            document.getElementById("welcomeOverlay").style.display = "flex";
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>'"]/g, character => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+            })[character]);
+        }
+
         const uiTranslations = {
             en: {
                 tagline: "Uganda Digital Safety & Rights Assistant",
@@ -483,7 +502,6 @@
 
         function updateLanguage(langCode) {
             const t = uiTranslations[langCode] || uiTranslations.en;
-
             document.getElementById("tagline").innerText = t.tagline;
             document.getElementById("ussdText").innerHTML = t.ussdText;
             document.getElementById("langLabel").innerText = t.langLabel;
@@ -494,32 +512,29 @@
             document.getElementById("resetBtn").innerText = t.askAnother;
             document.getElementById("helpHeading").innerText = t.helpHeading;
             document.getElementById("helpText").innerText = t.helpText;
-
             const speakBtn = document.getElementById("speakBtn");
-            if (speakBtn) {
-                speakBtn.innerHTML = t.playVoice;
-            }
+            if (speakBtn) speakBtn.innerHTML = t.playVoice;
+
+            syncLanguageControls(langCode);
+            updateWelcomeLanguage(langCode);
         }
 
         document.getElementById("queryForm").addEventListener("submit", async function (e) {
             e.preventDefault();
-
             const queryInput = document.getElementById("queryInput");
             const submitBtn = document.getElementById("submitBtn");
             const responseBox = document.getElementById("responseBox");
             const resetBtn = document.getElementById("resetBtn");
             const escalationBox = document.getElementById("escalationBox");
             const langCode = document.getElementById("languageSelect").value;
-
             const query = queryInput.value.trim();
             const t = uiTranslations[langCode] || uiTranslations.en;
-
             if (!query) return;
 
             submitBtn.disabled = true;
             submitBtn.innerText = t.loadingText;
             responseBox.style.display = "block";
-            responseBox.innerHTML = `⏳ ${t.loadingText}`;
+            responseBox.innerText = `⏳ ${t.loadingText}`;
 
             try {
                 const res = await fetch("/api/query", {
@@ -527,21 +542,17 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ query: query, language: langCode, location: "Uganda" })
                 });
-
                 const data = await res.json();
-
                 if (data.answer) {
                     responseBox.innerHTML = `
                         <div style="margin-bottom: 12px;">
-                            <button id="speakBtn" type="button" style="padding: 10px 18px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 6px;">
+                            <button id="speakBtn" type="button" style="padding: 10px 18px; background-color: #14bfa6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
                                 ${t.playVoice}
                             </button>
                         </div>
-                        <div id="answerText">${data.answer.replace(/\n/g, '<br>')}</div>
+                        <div id="answerText" style="white-space: pre-wrap; word-break: break-word;">${escapeHtml(data.answer).replace(/\n/g, '<br>')}</div>
                     `;
-
-                    document.getElementById("speakBtn").onclick = () => playVoice(data.answer, langCode);
-
+                    document.getElementById("speakBtn").onclick = () => speak(data.answer, langCode, ANSWER_RATE);
                     resetBtn.style.display = "block";
                     escalationBox.style.display = "block";
                 } else {
@@ -577,12 +588,6 @@
             result.innerHTML = message;
         }
 
-        function escapeHtml(value) {
-            return String(value).replace(/[&<>'"]/g, character => ({
-                "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-            })[character]);
-        }
-
         async function checkScamNumber() {
             const payload = scamPayload();
             if (!payload.number) return showScamResult("Enter a phone number first.");
@@ -591,7 +596,7 @@
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
                 });
                 const data = await response.json();
-                if (!response.ok) return showScamResult(data.error);
+                if (!response.ok) return showScamResult(escapeHtml(data.error));
                 const reasons = data.reasons.length ? `<br>Recent reasons: ${data.reasons.map(escapeHtml).join("; ")}` : "";
                 showScamResult(`<strong>Risk: ${escapeHtml(data.risk_level.toUpperCase())}</strong><br>Reports: ${data.report_count}${reasons}<br>${data.flags.map(escapeHtml).join("<br>")}`);
             } catch (error) {
@@ -607,55 +612,27 @@
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
                 });
                 const data = await response.json();
-                showScamResult(response.ok ? `Report saved for ${data.number}. Thank you for helping others stay safe.` : data.error);
+                showScamResult(response.ok ? `Report saved for ${escapeHtml(data.number)}. Thank you for helping others stay safe.` : escapeHtml(data.error));
             } catch (error) {
                 showScamResult("Could not save the report. Please try again.");
             }
         }
 
-        function playVoice(text, langCode) {
-            if (!("speechSynthesis" in window)) {
-                alert("Text-to-speech is not supported in this browser.");
-                return;
-            }
-
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-
-            const voiceLocales = {
-                en: "en-ZA",
-                sw: "sw-KE",
-                lg: "en-ZA",
-                nyn: "en-ZA",
-                lgg: "en-ZA",
-                ach: "en-ZA"
-            };
-
-            utterance.lang = voiceLocales[langCode] || "en-ZA";
-            utterance.rate = 0.90;
-            window.speechSynthesis.speak(utterance);
-        }
-
-        // Navigation: show one of the main sections and update active sidebar state
         function showSection(id) {
             const sections = ['legalSection', 'reportSection', 'exploreSection'];
             sections.forEach(s => {
                 const el = document.getElementById(s);
                 if (el) el.style.display = (s === id) ? 'block' : 'none';
             });
-            // Update sidebar active state
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.target === id);
             });
-            // focus first input in the shown section
             if (id === 'legalSection') document.getElementById('queryInput').focus();
             if (id === 'reportSection') document.getElementById('scamNumber').focus();
         }
 
-        // Explore actions: show quick guidance in the response box and scroll into view
         function sendExploreSms(choice) {
             const responseBox = document.getElementById('responseBox');
-            const t = uiTranslations[document.getElementById('languageSelect').value] || uiTranslations.en;
             let msg = '';
             if (choice === 1) {
                 msg = 'Safe Tips: Never share PINs or OTPs. Verify callers before sending money.';
@@ -671,5 +648,4 @@
         }
     </script>
 </body>
-
 </html>

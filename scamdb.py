@@ -1,10 +1,8 @@
 """
 Scam number reputation database for Bridge.
-
 The module stores reports in SQLite and exposes small functions that can be
 used by the web and USSD adapters.
 """
-
 import os
 import re
 import sqlite3
@@ -75,19 +73,35 @@ def init_db() -> None:
         conn.execute("CREATE INDEX IF NOT EXISTS idx_reports_number ON reports(number)")
 
 
+def check_duplicate_report(number: str, reporter: str = None, window_hours: int = 24) -> bool:
+    """
+    Check if this (number, reporter) pair has been reported recently.
+    Returns True if duplicate found, False if new report.
+    This prevents the same reporter from spam-reporting the same number repeatedly.
+    """
+    normalized = normalize_number(number)
+    cutoff = (datetime.now(timezone.utc) - timedelta(hours=window_hours)).isoformat()
+    
+    with _connection() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM reports WHERE number = ? AND reporter = ? AND reported_at > ? LIMIT 1",
+            (normalized, reporter, cutoff),
+        ).fetchone()
+    
+    return row is not None
+
+
 def report_number(number: str, reason: str, reporter: str = None) -> dict:
     """Save a report and return the saved record."""
     normalized = normalize_number(number)
     category = classify_reason(reason)
     reported_at = datetime.now(timezone.utc).isoformat()
-
     with _connection() as conn:
         cursor = conn.execute(
             "INSERT INTO reports (number, reporter, reason, category, reported_at) VALUES (?, ?, ?, ?, ?)",
             (normalized, reporter, reason, category, reported_at),
         )
         report_id = cursor.lastrowid
-
     return {
         "id": report_id,
         "number": normalized,
@@ -115,6 +129,7 @@ def check_number(number: str, recent_days: int = 90) -> dict:
 
     report_count = len(rows)
     recent_report_count = sum(1 for row in rows if row["reported_at"] >= cutoff)
+
     flags = []
     prefix_hit = _matches_suspicious_prefix(normalized)
     if prefix_hit:
@@ -157,6 +172,33 @@ def check_number(number: str, recent_days: int = 90) -> dict:
     }
 
 
+def mask_number(number: str) -> str:
+    """0772123456 -> 0772***456 -- enough to recognize, not enough to dox
+    whoever's number got reported (could be the scammer's spoofed line,
+    could occasionally be a mistaken report)."""
+    if len(number) <= 6:
+        return number
+    return number[:4] + "***" + number[-3:]
+
+
+def recent_reports(limit: int = 10) -> list[dict]:
+    """Recent reports for a public community feed. Numbers are masked
+    and reporter identity is never included."""
+    with _connection() as conn:
+        rows = conn.execute(
+            "SELECT number, category, reported_at FROM reports ORDER BY reported_at DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+    return [
+        {
+            "number_masked": mask_number(row["number"]),
+            "category": row["category"],
+            "reported_at": row["reported_at"],
+        }
+        for row in rows
+    ]
+
+
 def get_stats() -> dict:
     """Return aggregate report counts."""
     with _connection() as conn:
@@ -165,7 +207,6 @@ def get_stats() -> dict:
         by_category = conn.execute(
             "SELECT category, COUNT(*) AS c FROM reports GROUP BY category ORDER BY c DESC"
         ).fetchall()
-
     return {
         "total_reports": total,
         "unique_numbers_reported": unique_numbers,

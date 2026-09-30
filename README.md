@@ -1,11 +1,8 @@
-
 Bridge
 An offline digital safety and legal helpline for Uganda powered by Africa's Talking USSD, Voice, and SMS APIs.. It helps people spot mobile money scams and understand their rights, on any phone, with or without internet.
 
 2nd runner-up Africa's Talking Women in Tech Hackathon (Legal & Policy), August 2026.
 
-
-[Bridge web app](docs/screenshot.png)
 
 Features
 

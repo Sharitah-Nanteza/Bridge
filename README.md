@@ -27,8 +27,7 @@ pip install -r requirements.txt
 cp .env.example .env            # then add your own keys
 python app.py
 
-
-Open http://localhost:5000. To test USSD, SMS and voice, expose the app with a tunnel such as ngrok and set the callback URLs in your Africa's Talking sandbox.
+To test USSD, SMS and voice, expose the app with a tunnel such as ngrok and set the callback URLs in your Africa's Talking sandbox.
 
  Environment variables
 
